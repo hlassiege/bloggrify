@@ -1,5 +1,5 @@
 <template>
-    <NuxtLayout :name="theme"> <ContentDoc /> </NuxtLayout>
+    <NuxtLayout :name="theme" :doc="doc"> </NuxtLayout>
 </template>
 <script setup lang="ts">
 import { navigateTo } from "#app";
@@ -46,42 +46,35 @@ onMounted(() => {
     });
 });
 
-// fix me, should be in a component and not here
-if (config.comments.enabled) {
-    useHead({
-        script: [
-            {
-                async: true,
-                src: "https://talk.hyvor.com/embed/embed.js",
-                type: "module",
-            },
-        ],
-    });
-}
-
 if (doc.value) {
     useContentHead(doc.value);
 }
 
-const url = useAppConfig().url;
-const postLink = useAppConfig().url + doc.value?._path;
+const url = useAppConfig().url.replace(/\/$/, "");
+const postLink = url + doc.value?._path;
 
-const alternates =
-    doc.value?.alternates?.map((alternate: any) => {
-        const key = Object.keys(alternate)[0];
-        const value = alternate[key];
-        return {
-            rel: "alternate",
-            href: value,
-            hreflang: key,
-        };
-    }) || [];
+if (doc.value?.alternates) {
+    const alternates =
+        doc.value?.alternates?.map((alternate: any) => {
+            const key = Object.keys(alternate)[0];
+            const value = alternate[key];
+            return {
+                rel: "alternate",
+                href: value,
+                hreflang: key,
+            };
+        }) || [];
 
-alternates.push({
-    rel: "alternate",
-    href: postLink,
-    hreflang: doc.value?.language || "en",
-});
+    alternates.push({
+        rel: "alternate",
+        href: postLink,
+        hreflang: doc.value?.language || "en",
+    });
+
+    useHead({
+        link: alternates,
+    });
+}
 
 useHead({
     meta: [
@@ -103,7 +96,6 @@ useHead({
             rel: "canonical",
             href: postLink,
         },
-        ...alternates,
     ],
 });
 
