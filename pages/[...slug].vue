@@ -91,26 +91,8 @@ useHead({
             name: "og:url",
             content: postLink,
         },
-        {
-            key: "og:image",
-            name: "og:image",
-            content: url + "/images/" + doc.value?.cover,
-        },
-        { name: "og:image:alt", content: doc.value?.title },
         { name: "twitter:text:title", content: doc.value?.title },
-        {
-            name: "twitter:image",
-            content: url + "/images/" + doc.value?.cover,
-        },
         { name: "twitter:card", content: "summary" },
-        {
-            name: "article:published_time",
-            content: new Date(doc.value?.date).toISOString(),
-        },
-        {
-            name: "article:article:modified_time",
-            content: new Date(doc.value?.date).toISOString(),
-        },
         {
             name: "article:article:tag",
             content: doc.value?.tags ? doc.value.tags?.toString() : "",
@@ -124,4 +106,36 @@ useHead({
         ...alternates,
     ],
 });
+
+if (doc.value?.cover) {
+    useHead({
+        meta: [
+            {
+                key: "og:image",
+                name: "og:image",
+                content: url + "/images/" + doc.value?.cover,
+            },
+            { name: "og:image:alt", content: doc.value?.title },
+            {
+                name: "twitter:image",
+                content: url + "/images/" + doc.value?.cover,
+            },
+        ],
+    });
+}
+
+if (doc.value?.date) {
+    useHead({
+        meta: [
+            {
+                name: "article:published_time",
+                content: new Date(doc.value?.date).toISOString(),
+            },
+            {
+                name: "article:article:modified_time",
+                content: new Date(doc.value?.date).toISOString(),
+            },
+        ],
+    });
+}
 </script>
